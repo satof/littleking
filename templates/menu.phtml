@@ -1,0 +1,15 @@
+  <div id="sp-icon" class="sp-close"><span></span></div>
+  <ul id="menu">
+    <li><a href="/">出欠表</a></li>
+    <li><a href="/schedule">予定入力</a></li>
+    <li><a href="password">パスワード変更</a></li>
+    <li><a href="manual">使いかた</a></li>
+    <? if ($me['is_admin']) { ?>
+    <li><a href="member">（管）メンバー設定</a><li>
+    <li><a href="chpassword">（管）パスワード設定</a><li>
+    <li><a href="date">（管）日付設定</a><li>
+    <li><a href="symbol">（管）出欠記号設定</a><li>
+    <? } ?>
+    <li><a href="logout">ログアウト</a></li>
+  </ul>
+  <script type="text/javascript" src="js/sp-menu.js"></script>

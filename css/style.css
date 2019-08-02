@@ -1,0 +1,81 @@
+@charset "utf-8";
+/* CSS Document */
+
+html{
+    font-size: 62.5%;
+}
+body{
+    font-size:1.6rem;/* 16px*/
+    font-family: 'Avenir','Helvetica Neue','Helvetica','Arial','Hiragino Sans','ヒラギノ角ゴシック',YuGothic,'Yu Gothic','メイリオ', Meiryo,'ＭＳ Ｐゴシック','MS PGothic','sans-serif';
+    line-height: 2;
+    color:#313131;
+}
+h1 {
+    font-size: 36px;/* IE8以下とAndroid4.3以下用フォールバック */
+    font-size: calc(2.4rem + ((1vw - 0.64rem) * 2.1429));/* 24px~36pxで可変*/
+    line-height: 2.2;
+    height: 50px;
+    text-align: center;
+    background-color: steelblue;
+    color: white;
+}
+h2 {
+    font-size: 24px;/* IE8以下とAndroid4.3以下用フォールバック */
+    font-size: calc(2rem + ((1vw - 0.64rem) * 0.7143));/* 20px~24pxで可変*/
+    line-height: 1.3;
+    text-align: center;
+    padding: 10px;
+}
+@media (min-width: 1200px) {/* 1200px以上*/
+    h1{
+        font-size: 2.4rem;/* 24px*/
+    }
+    h2 {
+        font-size: 2rem;/* 20px*/
+    }
+}
+@media screen and (max-width: 640px) {/* 640px以下*/
+    body{
+    line-height: 2;
+    }
+    h1{
+        font-size: 2.4rem;/* 24px*/
+    }
+    h2 {
+        font-size: 2rem;/* 20px*/
+    }
+}
+a {
+    color:#313131;
+    text-decoration: none;
+}
+
+input[type=submit] {
+    font-size: 1.2em;
+    background-color: royalblue;
+    color: #FFFFFF;
+    display: block;
+    border-radius: 10px;
+    margin: 5px 5px 25px 5px;
+    padding: 10px;
+    box-sizing: border-box;
+    box-shadow: 0px 2px 2px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 2px 2px rgba(0,0,0,0.2);
+    -webkit-box-shadow: 0px 2px 2px rgba(0,0,0,0.2);
+    width: 98%;
+}
+
+.button {
+    font-size: 1.2em;
+    background-color: royalblue;
+    color: #FFFFFF;
+    display: block;
+    border-radius: 10px;
+    margin: 5px;
+    padding: 5px;
+    box-sizing: border-box;
+    box-shadow: 0px 2px 2px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 2px 2px rgba(0,0,0,0.2);
+    -webkit-box-shadow: 0px 2px 2px rgba(0,0,0,0.2);
+    width: 98%;
+}

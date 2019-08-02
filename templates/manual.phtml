@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!--nobanner-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+<title>使いかた</title>
+<link rel="stylesheet" href="css/ress.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="css/sp-menu.css" type="text/css" />
+<script type="text/javascript" src="js/jquery-1.12.0.min.js"></script>
+<style>
+  p {
+    margin: 10px;
+  }
+  .mark {
+    margin: 20px;
+    max-width: 600px;
+    text-align: center;
+  }
+  .mark table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .mark th {
+    border: solid 1px #ccc;
+    background-color: lightblue;
+  }
+  .mark td {
+    border: solid 1px #ccc;
+  }
+</style>
+</head>
+<body>
+  <h1>使いかた</h1>
+  <?= $this->fetch('menu.phtml', ['me' => $me]) ?>
+  <p>
+原則、１ヶ月程度先までの出欠を記入してください。<br>
+未定の場合は△でいいので、向こう1カ月は埋めてください。車出しの可否を備考欄に記入願います。<br>
+<br>
+（お願い）<br>
+週の後半（木・金）に、その週末の予定がかわり出席できなくなった場合は、この表を修正し、監督とヘッドコーチにメールをいれるようお願いします。<br>
+●印＝審判部・役員等で終日別行動、を追加しました。半日の場合は□or■を使ってください。<br>
+</p>
+<div class="mark">
+出欠記号の説明
+<table>
+    <tr>
+      <th>記号</th>
+      <th>説明</th>
+  </tr>
+  <? foreach($scheduleTypes as $id => $type) { ?>
+  <tr>
+    <td><?= e($type['symbol']); ?></td>
+    <td><?= e($type['description']); ?></td>
+  </tr>
+  <? } ?>
+</table>
+  </div>
+</body>
+</html>

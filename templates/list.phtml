@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<!--nobanner-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+<title>出欠表</title>
+<link rel="stylesheet" href="css/ress.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="css/sp-menu.css" type="text/css" />
+<script type="text/javascript" src="js/jquery-1.12.0.min.js"></script>
+<script type="text/javascript" src="js/fixed_midashi.js"></script>
+<style>
+  .list {
+    overflow: auto;
+    white-space: nowrap;
+  }
+  .list table {
+    border-collapse: collapse;
+  }
+  .list td, th {
+    border: solid 1px #ccc;
+    text-align: center;
+    padding: 0px 10px 0px 10px;
+  }
+  .list thead th {
+    background-color: lightblue;
+    font-weight: normal;
+    vertical-align: top;
+    line-height: 1.6em;
+  }
+  .list tbody th {
+    background-color: mintcream;
+    font-weight: normal;
+  }
+
+  .date-comment {
+    font-size: 90%;
+    color: #666;
+    white-space: nowrap;
+  }
+
+  .content{
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .modal{
+    display: none;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    width: 100%;
+	  z-index: 900;
+  }
+  .modal__bg{
+    background: rgba(0,0,0,0.8);
+    height: 100vh;
+    position: absolute;
+    width: 100%;
+	  z-index: 901;
+  }
+  .modal__content{
+    background: #fff;
+    left: 50%;
+    padding: 20px;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 60%;
+    text-align: center;
+	  z-index: 902;
+  }
+  .comment{
+    background: lightyellow;
+  }
+</style>
+</head>
+<body>
+  <h1>出欠表</h1>
+  <?= $this->fetch('menu.phtml', ['me' => $me]) ?>
+
+  <? foreach($answers as $member_id => $dates) { ?>
+    <? foreach($dates as $date => $answer) { ?>
+      <? if (!empty($answer['comment'])) { ?>
+        <div id="<?= "modal_{$member_id}_{$date}" ?>" class="modal js-modal">
+          <div class="modal__bg js-modal-close"></div>
+          <div class="modal__content">
+            <p><?= $answer['comment'] ?></p><br>
+            <a class="js-modal-close" href=""><div class="button">閉じる</div></a>
+          </div>
+        </div>
+      <? } ?>
+    <? } ?>
+  <? } ?>
+
+  <div class="list">
+    <table class="fixedHead" data-fixedhead="rows:1; cols:1;">
+      <thead>
+        <tr>
+          <th>　　　</th>
+          <? foreach($scheduleDates as $date => $content) { ?>
+          <th><div class='date'><?= dfmt($date) ?></div><div class='date-comment'><?= e($content['comment']) ?></div></th>
+          <? } ?>
+        </tr>
+      </thead>
+      <tbody>
+        <? foreach($members as $member_id => $member) { ?>
+        <tr>
+          <th><?= e($member['name']); ?></th>
+          <? foreach($scheduleDates as $date => $content) { ?>
+            <? if (empty($answers[$member_id][$date]['comment'])) { ?>
+              <td><?= $scheduleTypes[$answers[$member_id][$date]['schedule_type_id']]['symbol'] ? e($scheduleTypes[$answers[$member_id][$date]['schedule_type_id']]['symbol']) : '　'; ?></td>
+            <? } else { ?>
+              <td class="comment">
+                <a class="js-modal-open" href="" data-target="<?= "modal_{$member_id}_{$date}" ?>">
+                <?= $scheduleTypes[$answers[$member_id][$date]['schedule_type_id']]['symbol'] ? e($scheduleTypes[$answers[$member_id][$date]['schedule_type_id']]['symbol']) : '　'; ?>
+                </a>
+              </td>
+            <? } ?>
+          <? } ?>
+        </tr>
+        <? } ?>
+        <tr>
+          <th>回答者<br><?= count($members) ?>人</th>
+          <? foreach($scheduleDates as $date => $content) { ?>
+          <td>
+              　：<?= $sammary[$date][0] ?><br>
+            <? foreach($scheduleTypes as $scheduleTypeId => $type) { ?>
+              <?= e($type['symbol']); ?>：<?= $sammary[$date][$scheduleTypeId] ? e($sammary[$date][$scheduleTypeId]) : 0; ?><br>
+            <? } ?>
+          </td>
+          <? } ?>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    $(function(){
+      FixedMidashi.create();
+    });
+
+    var adjustHeight = function(){
+      hsize = $(window).height();
+      $("list").css("height", hsize + "px");
+    }
+    $(window).load(function () {
+      adjustHeight();
+    });
+    $(window).resize(function () {
+      adjustHeight();
+    });
+      
+    $(function(){
+      $('.js-modal-open').each(function(){
+        $(this).on('click',function(){
+          var target = $(this).data('target');
+          var modal = document.getElementById(target);
+          $(modal).fadeIn();
+          return false;
+        });
+      });
+      $('.js-modal-close').on('click',function(){
+        $('.js-modal').fadeOut();
+        return false;
+      }); 
+    });
+
+  </script>
+</body>
+</html>
