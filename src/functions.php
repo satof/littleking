@@ -133,22 +133,29 @@ function updateScheduleTerm($db) {
     $storedDates[] = $storedEndDate;
   }
 
-  if (!empty($storedDates)) {
-    $pastScheduleDates = [];
-    foreach ($storedDates as $storedDate) {
-      if ($storedDate <= $today) {
-        $pastScheduleDates[] = $storedDate;
+  // 当日より前の連続したスケジュールを削除対象とする（当日が含まれる連続したスケジュールは削除しない）
+  $deleteBefore = null;
+  $lastIndex = count($storedDates) - 1;
+  for ($i = $lastIndex; $i >= 0; $i--) {
+    if ($storedDates[$i] < $today) {
+      if ($i == $lastIndex ||
+        $storedDates[$i]->diff($storedDates[$i+1])->days > 1) {
+        $deleteBefore = $storedDates[$i];
+        break;
       }
-    }
-    // 過去のschedule_dateが存在しない、または当日までschedule_dateが続いている場合は期間更新しない
-    // （週に1回は誰かがスケジュールを見て、1週ずつ更新される前提）
-    if (empty($pastScheduleDates) ||
-        count($pastScheduleDates) == ($pastScheduleDates[0]->diff($today))->days + 1) {
-      return true;
     }
   }
 
-  // 7週分の土日月までを追加対象とする（月曜は祝日が多いため）
+  if (!empty($storedDates) && !$deleteBefore) {
+    return true;
+  }
+
+  // deleteBeforeの計算ミスで当日以降の日付が削除されないようにガード
+  if ($deleteBefore >= $today) {
+    return false;
+  }
+
+  // 7週分の土日+月までを追加対象とする（月曜は祝日が多いため）
   $addEndDate = clone $today;
   for ($i = 1; $i <= 7; $i++) {
     $addEndDate = $addEndDate->modify('next monday');
@@ -163,8 +170,7 @@ function updateScheduleTerm($db) {
   } else {
     return false;
   }
-  $addStartDate = $storedEndDate ? $storedEndDate : $today;
-  $addStartDate->modify('+1 days');
+  $addStartDate = $storedEndDate ? (clone $storedEndDate)->modify('+1 days') : $today;
   $addDates = [];
   foreach ($hoidays as $date => $desc) {
     $holiday = new DateTime($date);
@@ -190,14 +196,16 @@ function updateScheduleTerm($db) {
   }
 
   // 過去日を削除
-  $sql = "DELETE FROM schedule_dates WHERE schedule_date < :date";
-  $stmt = $db->prepare($sql);
-  $stmt->bindParam(':date', $today->format('Y-m-d'));
-  $stmt->execute();
-  $sql = "DELETE FROM answers WHERE schedule_date < :date";
-  $stmt = $db->prepare($sql);
-  $stmt->bindParam(':date', $today->format('Y-m-d'));
-  $stmt->execute();
+  if ($deleteBefore) {
+    $sql = "DELETE FROM schedule_dates WHERE schedule_date <= :date";
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam(':date', $deleteBefore->format('Y-m-d'));
+    $stmt->execute();
+    $sql = "DELETE FROM answers WHERE schedule_date <= :date";
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam(':date', $deleteBefore->format('Y-m-d'));
+    $stmt->execute();
+  }
 
   return true;
 }
