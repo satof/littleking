@@ -122,23 +122,36 @@ function getSelfSchedules($db) {
 }
 
 function updateScheduleTerm($db) {
-  $sql = "SELECT max(schedule_date) as schedule_date FROM schedule_dates";
+  $today = new DateTime(date('Y-m-d'));
+
+  $sql = "SELECT schedule_date FROM schedule_dates order by schedule_date";
   $stmt = $db->query($sql);
-  $dbEndDate = null;
-  if ($row = $stmt->fetch()) {
-    $dbEndDate = new DateTime($row['schedule_date']);
+  $storedDates = [];
+  $storedEndDate = null;
+  while ($row = $stmt->fetch()) {
+    $storedEndDate = new DateTime($row['schedule_date']);
+    $storedDates[] = $storedEndDate;
   }
 
-  // 7週分の土日まで（月曜日になったら更新するようにnext mondyで判断する）
-  $endDate = (new DateTime());
+  if (!empty($storedDates)) {
+    $pastScheduleDates = [];
+    foreach ($storedDates as $storedDate) {
+      if ($storedDate <= $today) {
+        $pastScheduleDates[] = $storedDate;
+      }
+    }
+    // 過去のschedule_dateが存在しない、または当日までschedule_dateが続いている場合は期間更新しない
+    // （週に1回は誰かがスケジュールを見て、1週ずつ更新される前提）
+    if (empty($pastScheduleDates) ||
+        count($pastScheduleDates) == ($pastScheduleDates[0]->diff($today))->days + 1) {
+      return true;
+    }
+  }
+
+  // 7週分の土日月までを追加対象とする（月曜は祝日が多いため）
+  $addEndDate = clone $today;
   for ($i = 1; $i <= 7; $i++) {
-    $endDate = $endDate->modify('next monday');
-  }
-  $endDate->modify('-1 days');
-
-  // 追加の必要がなければ終了
-  if ($dbEndDate >= $endDate) {
-    return true;
+    $addEndDate = $addEndDate->modify('next monday');
   }
 
   // 祝日の取得
@@ -150,25 +163,26 @@ function updateScheduleTerm($db) {
   } else {
     return false;
   }
-  $startDate = $dbEndDate ? $dbEndDate : new DateTime();
-  $dates = [];
+  $addStartDate = $storedEndDate ? $storedEndDate : $today;
+  $addStartDate->modify('+1 days');
+  $addDates = [];
   foreach ($hoidays as $date => $desc) {
     $holiday = new DateTime($date);
-    if ($holiday >= $startDate && $holiday <= $endDate) {
-      $dates[$holiday->format('Y-m-d')] = true;
+    if ($holiday >= $addStartDate && $holiday <= $addEndDate) {
+      $addDates[$holiday->format('Y-m-d')] = true;
     }
   }
 
   // 追加する土日の取得
-  $date = clone $startDate;
-  while ($date->modify('next sunday') <= $endDate) {
-    $dates[$date->modify('-1 days')->format('Y-m-d')] = true;
-    $dates[$date->modify('+1 days')->format('Y-m-d')] = true;
+  $date = clone $addStartDate;
+  while ($date->modify('next sunday') <= $addEndDate) {
+    $addDates[$date->modify('-1 days')->format('Y-m-d')] = true;
+    $addDates[$date->modify('+1 days')->format('Y-m-d')] = true;
   }
-  ksort($dates);
+  ksort($addDates);
   
   // DBに追加
-  foreach($dates as $date => $f) {
+  foreach($addDates as $date => $f) {
     $sql = "INSERT INTO schedule_dates values (:date, null, now(), now())";
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':date', $date);
@@ -176,14 +190,13 @@ function updateScheduleTerm($db) {
   }
 
   // 過去日を削除
-  $tody = new DateTime();
   $sql = "DELETE FROM schedule_dates WHERE schedule_date < :date";
   $stmt = $db->prepare($sql);
-  $stmt->bindParam(':date', $tody->format('Y-m-d'));
+  $stmt->bindParam(':date', $today->format('Y-m-d'));
   $stmt->execute();
   $sql = "DELETE FROM answers WHERE schedule_date < :date";
   $stmt = $db->prepare($sql);
-  $stmt->bindParam(':date', $tody->format('Y-m-d'));
+  $stmt->bindParam(':date', $today->format('Y-m-d'));
   $stmt->execute();
 
   return true;
