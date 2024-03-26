@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!--nobanner-->
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -7,6 +6,7 @@
 <title>出欠記号設定</title>
 <link rel="stylesheet" href="css/ress.css" type="text/css" />
 <link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="css/style-add.css" type="text/css" />
 <link rel="stylesheet" href="css/sp-menu.css" type="text/css" />
 <link rel="stylesheet" href="css/jquery-ui-1.12.0.css" type="text/css" />
 <link rel="stylesheet" href="css/toastr.min.css" type="text/css" />
@@ -182,8 +182,10 @@ input[type=checkbox]:checked + .checkbox01::after {
 </style>
 </head>
 <body>
-  <h1>出欠記号設定</h1>
-  <?= $this->fetch('menu.phtml', ['me' => $me]) ?>
+  <div class="title-bar">
+    <h1>出欠記号設定</h1>
+    <?= $this->fetch('menu.phtml', ['me' => $me]) ?>
+  </div>
 
   <p>
 ・タップして編集します。<br>

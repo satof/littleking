@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!--nobanner-->
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -7,6 +6,7 @@
 <title>使いかた</title>
 <link rel="stylesheet" href="css/ress.css" type="text/css" />
 <link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="css/style-add.css" type="text/css" />
 <link rel="stylesheet" href="css/sp-menu.css" type="text/css" />
 <script type="text/javascript" src="js/jquery-1.12.0.min.js"></script>
 <style>
@@ -32,8 +32,10 @@
 </style>
 </head>
 <body>
-  <h1>使いかた</h1>
-  <?= $this->fetch('menu.phtml', ['me' => $me]) ?>
+  <div class="title-bar">
+    <h1>使いかた</h1>
+    <?= $this->fetch('menu.phtml', ['me' => $me]) ?>
+  </div>
   <p>
 原則、１ヶ月程度先までの出欠を記入してください。<br>
 未定の場合は△でいいので、向こう1カ月は埋めてください。車出しの可否を備考欄に記入願います。<br>

@@ -1,0 +1,14 @@
+@charset "utf-8";
+/* CSS Document */
+
+/* スマホのキャッシュが残るため、追加分は別ファイルで読み込ませている */
+
+.title-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: steelblue;
+    color: #fff;
+    height: 50px;
+    position: relative;
+}

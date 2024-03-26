@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!--nobanner-->
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -7,6 +6,7 @@
 <title>日付設定</title>
 <link rel="stylesheet" href="css/ress.css" type="text/css" />
 <link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="css/style-add.css" type="text/css" />
 <link rel="stylesheet" href="css/sp-menu.css" type="text/css" />
 <script type="text/javascript" src="js/jquery-1.12.0.min.js"></script>
 <style>
@@ -47,8 +47,10 @@
 </style>
 </head>
 <body>
-  <h1>日付設定</h1>
-  <?= $this->fetch('menu.phtml', ['me' => $me]) ?>
+  <div class="title-bar">
+    <h1>日付設定</h1>
+    <?= $this->fetch('menu.phtml', ['me' => $me]) ?>
+  </div>
 
   <p>
 ・日付の期間は自動で更新されます。
